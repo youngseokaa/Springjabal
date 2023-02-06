@@ -32,7 +32,7 @@ public class Memocontroller {
         return memoService.update(id, requestDto);
     }
     @DeleteMapping("api/memos/{id}")
-    public Long deletMemo(@PathVariable Long id){
-        return memoService.deleteMemo(id);
+    public Long deleteMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto){
+        return memoService.deleteMemo(id,requestDto);
     }
 }

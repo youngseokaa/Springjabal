@@ -30,19 +30,21 @@
             let username = message['username'];
             let contents = message['contents'];
             let modifiedAt = message['modifiedAt'];
-            addHTML(id, username, contents, modifiedAt);
+            let name = message['name'];
+            let title = message['title'];
+            addHTML(id, username, contents, modifiedAt, name, title);
           }
         }
       });
     }
 
     // 메모 하나를 HTML로 만들어서 body 태그 내 원하는 곳에 붙입니다.
-    function addHTML(id, username, contents, modifiedAt) {
-      let tempHtml = makeMessage(id, username, contents, modifiedAt);
+    function addHTML(id, username, contents, modifiedAt, name, title) {
+      let tempHtml = makeMessage(id, username, contents, modifiedAt ,name ,title);
       $('#cards-box').append(tempHtml);
     }
 
-    function makeMessage(id, username, contents, modifiedAt) {
+    function makeMessage(id, username, contents, modifiedAt, name, title) {
       return `<div class="card">
                         <!-- date/username 영역 -->
                         <div class="metadata">
@@ -50,9 +52,13 @@
                                 ${modifiedAt}
                             </div>
                             <div id="${id}-username" class="username">
-                                ${username}
+                                ${name}
+                            </div>
+                            <div id="${id}-username" class="username">
+                                ${title}
                             </div>
                         </div>
+
                         <!-- contents 조회/수정 영역-->
                         <div class="contents">
                             <div id="${id}-contents" class="text">
@@ -61,6 +67,8 @@
                             <div id="${id}-editarea" class="edit">
                                 <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
                             </div>
+
+                            <input id="${id}-password" type="password" name="password" placeholder="Password">
                         </div>
                         <!-- 버튼 영역-->
                         <div class="footer">
@@ -132,22 +140,24 @@
 
     function editPost(id) {
       showEdits(id);
+      deleteOne(id);
       let contents = $(`#${id}-contents`).text().trim();
       $(`#${id}-textarea`).val(contents);
+      $(`#${id}-password`).val();
     }
     // 메모를 수정합니다.
     function submitEdit(id) {
       // 1. 작성 대상 메모의 username과 contents 를 확인합니다.
       let username = $(`#${id}-username`).text().trim();
       let contents = $(`#${id}-textarea`).val().trim();
-
+      let password = $(`#${id}-password`).val();
       // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
       if (isValidContents(contents) == false) {
         return;
       }
 
       // 3. 전달할 data JSON으로 만듭니다.
-      let data = {'username': username, 'contents': contents};
+      let data = {'username': username, 'contents': contents,'password':password};
 
       // 4. PUT /api/memos/{id} 에 data를 전달합니다.
       $.ajax({
@@ -156,17 +166,29 @@
         contentType: "application/json",
         data: JSON.stringify(data),
         success: function (response) {
-          alert('메시지 변경에 성공하였습니다.');
+          if(response === 100){
+            alert('메시지 전송에 실패하였습니다 비밀번호를 다시 입력해주세요')
+          } else {
+            alert('메시지 변경에 성공하였습니다.');
+          }
           window.location.reload();
         }
       });
     }
     function deleteOne(id) {
+      let password = $(`#${id}-password`).val();
+      let data = {'password':password};
       $.ajax({
         type: "DELETE",
         url: `/api/memos/${id}`,
+        contentType: "application/json",
+        data: JSON.stringify(data),
         success: function (response) {
-          alert('메시지 삭제에 성공하였습니다.');
+          if(response === 100){
+            alert('메시지 전송에 실패하였습니다 비밀번호를 다시 입력해주세요')
+          }else {
+            alert('메시지 삭제에 성공하였습니다.');
+          }
           window.location.reload();
         }
       })
@@ -402,13 +424,18 @@
       <div class="login-wrapper">
         <form method="post" action="서버의url" id="login-form">
           <input id="email" type="text" name="email" placeholder="Email">
-          <input id="password" type="text" name="password" placeholder="Password">
+          <input id="password" type="password" name="password" placeholder="Password">
         </form>
       </div>
-    </div>
+      <div>
         <textarea class="field" placeholder="공유하고 싶은 소식을 입력하세요." name="contents" th:id="contents" cols="30"
                   rows="10"></textarea>
-    <img src="/images/send.png" alt="" onclick="writePost()">
+        <img src="/images/send.png" alt="" onclick="writePost()">
+      </div>
+    </div>
+  </div>
+
+
 
     <div id="cards-box" class="area-read">
 
