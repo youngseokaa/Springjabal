@@ -27,7 +27,7 @@ public class Memocontroller {
         return memoService.getMemos();
     }
 
-    @PostMapping("/api/memos/{id}")
+    @PutMapping("/api/memos/{id}")
     public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto){
         return memoService.update(id, requestDto);
     }

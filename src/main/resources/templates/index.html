@@ -103,7 +103,10 @@
     function writePost() {
       // 1. 작성한 메모를 불러옵니다.
       let contents = $('#contents').val();
-
+      let title = $('#title').val();
+      let name = $('#name').val();
+      let email = $('#email').val();
+      let password = $('#password').val();
       // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
       if (isValidContents(contents) == false) {
         return;
@@ -113,7 +116,7 @@
       let username = genRandomName(10);
 
       // 4. 전달할 data JSON으로 만듭니다.
-      let data = {'username': username, 'contents': contents};
+      let data = {'username': username, 'contents': contents, 'name' : name, 'title' : title, 'email':email, 'password' : password};
 
       $.ajax({
         type: "POST",
@@ -393,11 +396,23 @@
     </p>
   </div>
   <div class="area-write">
+    <div class="input-group mb-3">
+      <input id="title" type="text" class="form-control" name = "title" placeholder="제목">
+      <input id="name" type="text" class="form-control" name = "name" placeholder="작성자명">
+      <div class="login-wrapper">
+        <form method="post" action="서버의url" id="login-form">
+          <input id="email" type="text" name="email" placeholder="Email">
+          <input id="password" type="text" name="password" placeholder="Password">
+        </form>
+      </div>
+    </div>
         <textarea class="field" placeholder="공유하고 싶은 소식을 입력하세요." name="contents" th:id="contents" cols="30"
                   rows="10"></textarea>
     <img src="/images/send.png" alt="" onclick="writePost()">
-  </div>
-  <div id="cards-box" class="area-read">
+
+    <div id="cards-box" class="area-read">
+
+    </div>
 
   </div>
 </div>
